@@ -48,6 +48,16 @@ func CrossingWiresIntersection() {
     print("The wires cross at distance \(distance)")
 }
 
+func BreakPassword() {
+    let valid_passwords = PasswordBreaker().GetValidPasswordInRange(382345, to:843167)
+
+    for password in valid_passwords {
+        print(" --> \(password)")
+    }
+    print("There are \(valid_passwords.count) valid password")
+}
+
 //print("We need \(CalculateFuelConsumption()) fuel")
 //CalculateIntCode()
-CrossingWiresIntersection()
+//CrossingWiresIntersection()
+BreakPassword()
