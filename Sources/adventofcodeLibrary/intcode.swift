@@ -28,10 +28,10 @@ public class IntCode {
             let action = try operation.Execute(memory)
 
             switch action {
-                case .Stop:
-                    return memory.Get()
-                case .Advance(let offset):
-                    memory.Advance(offset)
+            case .Stop:
+                return memory.Get()
+            case .Advance(let offset):
+                memory.Advance(offset)
             }
         }
     }

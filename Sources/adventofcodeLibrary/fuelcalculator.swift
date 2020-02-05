@@ -13,7 +13,7 @@ public class FuelCalculator {
     }
 
     public func calculateCombined(_ masses: [Int]) -> Int {
-       return masses.map{ calculate($0) }.reduce(0, {$0+$1})
+        return masses.map{ calculate($0) }.reduce(0, {$0+$1})
     }
 }
 

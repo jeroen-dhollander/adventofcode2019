@@ -42,6 +42,7 @@ class Stop : Operation {
     }
 }
 
+// Allow us to throw strings as errors.
 extension String: Error{}
 
 func GetOperation(opcode: Int) throws -> Operation {
