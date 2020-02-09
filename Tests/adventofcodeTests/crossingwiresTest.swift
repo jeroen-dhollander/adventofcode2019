@@ -44,7 +44,7 @@ final class crossingwiresTests: XCTestCase {
                 Point(x:0, y:1):1,
                 Point(x:1, y:1):2,
             ]),
-            ("Distance is the first time a piont is encountered",
+            ("Distance is the first time a point is encountered",
              input:["R2", "U1", "L1", "D1"],
              output:[
                 Point(x:1, y:0):1,
@@ -66,7 +66,7 @@ final class crossingwiresTests: XCTestCase {
         }
     }
 
-    func testDistanceToFirstInterception() throws {
+    func testDistanceToFirstIntersection() throws {
         let testCases : [(testName:String, wire1:[String], wire2:[String], expected:Distance?)] = [
             ("Single intersection", 
              wire1: ["R5", "U1"],
@@ -90,7 +90,7 @@ final class crossingwiresTests: XCTestCase {
 
         for (testName, wire1, wire2, expected) in testCases {
             print("-----")
-            let actual = CrossingWires().GetDistanceToFirstInterception(wire1:wire1, wire2:wire2)
+            let actual = CrossingWires().GetDistanceToFirstIntersection(wire1:wire1, wire2:wire2)
             XCTAssertEqual(
                 expected, actual,
                 "Failed for testcase '\(testName)'")
@@ -99,6 +99,6 @@ final class crossingwiresTests: XCTestCase {
 
     static var allTests = [
         ("testPathBuilder", testPathBuilder),
-        ("testDistanceToFirstInterception", testDistanceToFirstInterception),
+        ("testDistanceToFirstIntersection", testDistanceToFirstIntersection),
     ]
 }

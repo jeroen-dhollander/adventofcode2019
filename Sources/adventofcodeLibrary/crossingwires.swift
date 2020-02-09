@@ -106,16 +106,16 @@ public class PathBuilder {
 public class CrossingWires {
     public init() {}
 
-    public func GetDistanceToFirstInterception(wire1:[String], wire2:[String]) -> Distance? {
+    public func GetDistanceToFirstIntersection(wire1:[String], wire2:[String]) -> Distance? {
         do {
-            return try TryToGetDistanceToFirstInterception(wire1:wire1, wire2:wire2)
+            return try TryToGetDistanceToFirstIntersection(wire1:wire1, wire2:wire2)
         } catch {
             print("Got error \(error)")
             return nil
         }
     }
 
-    func TryToGetDistanceToFirstInterception(wire1:[String], wire2:[String]) throws -> Distance {
+    func TryToGetDistanceToFirstIntersection(wire1:[String], wire2:[String]) throws -> Distance {
         let wire1Distances = try PathBuilder(wire1).TryToBuild()
         let wire2Distances = try PathBuilder(wire2).TryToBuild()
 

@@ -2,15 +2,15 @@
 import XCTest
 @testable import adventofcodeLibrary
 
-final class intcodeTests: XCTestCase {
-    var computer : IntCode!
+final class cpuTests: XCTestCase {
+    var cpu : Cpu!
 
     override func setUp() {
         super.setUp()
-        computer = IntCode()
+        cpu = Cpu()
     }
 
-    func testCompute() throws {
+    func testRun() throws {
         let testCases : [(testName:String, input:[Int], output:[Int]?)] = [
             ("99 means stop", 
              input: [99],
@@ -64,7 +64,7 @@ final class intcodeTests: XCTestCase {
 
         for (testName, input, expectedOutput) in testCases {
             print("-----")
-            let output = computer.compute(input)
+            let output = cpu.Run(input)
             XCTAssertEqual(
                 output,
                 expectedOutput,
@@ -73,6 +73,6 @@ final class intcodeTests: XCTestCase {
     }
 
     static var allTests = [
-        ("testCompute", testCompute),
+        ("testRun", testRun),
     ]
 }
