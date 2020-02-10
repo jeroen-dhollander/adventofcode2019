@@ -57,9 +57,7 @@ class MemoryImpl : Memory {
     }
 
     func Write(_ value: Int, at address: Int) throws {
-        if address < 0 || address >= memory.count {
-            throw MemoryError.Invalidaddress(address)
-        }
+        try Check(address:address)
         memory[address] = value
     }
 
@@ -67,12 +65,23 @@ class MemoryImpl : Memory {
         try Write(value, at:current_address+offset)
     }
 
-    func Advance(_ offset: Int) {
-        current_address += offset
+    func Advance(_ offset: Int)  throws{
+        try JumpTo(current_address + offset)
+    }
+
+    func JumpTo(_ address: Int) throws {
+        try Check(address:address)
+        current_address = address
     }
 
     func Get() -> [Int] {
         return memory
+    }
+
+    func Check(address: Int) throws {
+        if address < 0 || address >= memory.count {
+            throw MemoryError.Invalidaddress(address)
+        }
     }
 
 }

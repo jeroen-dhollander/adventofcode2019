@@ -23,6 +23,11 @@ class ArgumentReader {
         }
     }
 
+    // Reads the given argument as a (destination) address.
+    func GetAddress(_ argument_index:Int) throws -> Int {
+        return try memory.Read(offset:argument_index)
+    }
+
 
     private func GetParameterMode(_ argument_index:Int) throws -> ParameterMode {
         let opcode_and_parameter_mode = try memory.Read()

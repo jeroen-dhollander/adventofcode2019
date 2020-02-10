@@ -3,8 +3,46 @@ import XCTest
 @testable import adventofcodeLibrary
 
 final class cpuTests: XCTestCase {
-    func testRun() throws {
-        let testCases : [(testName:String, memory:[Int], output: [Int]?)] = [
+    typealias TestCase = (
+        testName:String,
+        memory:[Int],
+        output: [Int]?
+    )
+    typealias InputTestCase = (
+        testName:String,
+        memory:[Int],
+        input: Input,
+        output: [Int]?
+    )
+
+    func RunTests(_ tests : [TestCase]) {
+        for (testName, memory, expectedOutput) in tests {
+            print("-----")
+            let cpu = Cpu(memory)
+            let output = cpu.Run()
+            XCTAssertEqual(
+                output,
+                expectedOutput,
+                "Failed for testcase '\(testName)'")
+        }
+    }
+
+    func RunInputTests(_ tests : [InputTestCase]) {
+        for (testName, memory, input, expectedOutput) in tests {
+            print("-----")
+            let cpu = Cpu(memory)
+            let output = cpu.Run(input:input)
+
+            XCTAssertEqual(
+                output.map{ $0.Get() }, 
+                expectedOutput,
+                "Failed for testcase '\(testName)' with input \(input)")
+        }
+    }
+
+
+    func testBasicOperations() throws {
+        RunTests([
             ("99 means stop", 
              memory: [99],
              output: [99]),
@@ -64,57 +102,110 @@ final class cpuTests: XCTestCase {
              output: [1, 9, 10, 11, 2, 12, 13, 14, 99, 11, 22, 33, 10, 20, 200]),
             ("complex example from webpage",
              memory: [1,    9, 10, 3,  2, 3, 11, 0, 99, 30, 40, 50],
-             output: [3500, 9, 10, 70, 2, 3, 11, 0, 99, 30, 40, 50])
-        ]
-
-        for (testName, memory, expectedOutput) in testCases {
-            print("-----")
-            let cpu = Cpu(memory)
-            let output = cpu.Run()
-            XCTAssertEqual(
-                output,
-                expectedOutput,
-                "Failed for testcase '\(testName)'")
-        }
+             output: [3500, 9, 10, 70, 2, 3, 11, 0, 99, 30, 40, 50]),
+        ])
     }
 
-    func testRunWithInput() throws {
-        let testCases : [(
-            testName: String,
-            memory: [Int],
-            input: Input,
-            output: [Int]?)] 
-            = [
-                ("4 means write to output",
-                 memory: [4, 3, 99, 666],
-                 input:  Input([]),
-                 output: [666]),
-                ("3 means read from input",
-                 // This program will read an input value and store it 
-                 // in the spot of the "-1" so it is written to the output.
-                 memory: [3, 0, 4, 0, 99],
-                 input:  Input([999]),
-                 output: [999]),
-                ("4 supports parameter mode",
-                 memory: [104, 666, 99],
-                 input:  Input([]),
-                 output: [666])
-        ]
+    func testJumps() throws {
+        RunTests([
+            ("jump-if-true jumps if parameter is non zero",
+             // This will crash if we do not take the jump
+             memory: [1105, 1, 4, -66, 99],
+             output: [1105, 1, 4, -66, 99]),
+            ("jump-if-true does not jump if parameter is zero",
+             // This will crash if take the jump
+             memory: [1105, 0, 4, 99, -66],
+             output: [1105, 0, 4, 99, -66]),
+            ("jump-if-true supports parameter mode for condition",
+             // This will crash if we take the jump
+             memory: [1005, 5, 4, 99, -66, 0],
+             output: [1005, 5, 4, 99, -66, 0]),
+            ("jump-if-true supports parameter mode for destination",
+             // This will crash if we do not take the jump
+             memory: [0105, 1, 5, -66, 99, 4],
+             output: [0105, 1, 5, -66, 99, 4]),
+            ("jump-if-false jumps if parameter is zero",
+             // This will crash if we do not take the jump
+             memory: [1106, 0, 4, -66, 99],
+             output: [1106, 0, 4, -66, 99]),
+            ("jump-if-false does not jump if parameter is not zero",
+             // This will crash if take the jump
+             memory: [1106, 1, 4, 99, -66],
+             output: [1106, 1, 4, 99, -66]),
+            ("jump-if-false supports parameter mode for condition",
+             // This will crash if we take the jump
+             memory: [1006, 5, 4, 99, -66, 1],
+             output: [1006, 5, 4, 99, -66, 1]),
+            ("jump-if-false supports parameter mode for destination",
+             // This will crash if we do not take the jump
+             memory: [0106, 0, 5, -66, 99, 4],
+             output: [0106, 0, 5, -66, 99, 4]),
+            ("less-than stores one if value1 < value2",
+             memory: [1107, 11, 22, 5, 99, -1],
+             output: [1107, 11, 22, 5, 99, 1]),
+            ("less-than stores zero if value1 == value2",
+             memory: [1107, 11, 11, 5, 99, -1],
+             output: [1107, 11, 11, 5, 99, 0]),
+            ("less-than stores zero if value1 > value2",
+             memory: [1107, 22, 11, 5, 99, -1],
+             output: [1107, 22, 11, 5, 99, 0]),
+            ("equals stores one if value1 == value2",
+             memory: [1108, 11, 11, 5, 99, -1],
+             output: [1108, 11, 11, 5, 99, 1]),
+            ("equals stores zero if value1 < value2",
+             memory: [1108, 11, 22, 5, 99, -1],
+             output: [1108, 11, 22, 5, 99, 0]),
+            ("equals stores zero if value1 > value2",
+             memory: [1108, 22, 11, 5, 99, -1],
+             output: [1108, 22, 11, 5, 99, 0]),
+        ])
 
-        for (testName, memory, input, expectedOutput) in testCases {
-            print("-----")
-            let cpu = Cpu(memory)
-            let output = cpu.Run(input:input)
+        RunInputTests([
+            ("First example from the webpage",
+             // Outputs '1' if input is 8, '0' otherwise
+             memory: [3,9,8,9,10,9,4,9,99,-1,8],
+             input: Input([8]),
+             output: [1]),
+            ("First example from the webpage (2)",
+             // Outputs '1' if input is 8, '0' otherwise
+             memory: [3,9,8,9,10,9,4,9,99,-1,8],
+             input: Input([7]),
+             output: [0]),
+            ("Second example from the webpage",
+             // Outputs '1' if input is less than 8, '0' otherwise
+             memory: [3,9,7,9,10,9,4,9,99,-1,8],
+             input: Input([7]),
+             output: [1]),
+            ("Second example from the webpage (2)",
+             // Outputs '1' if input is less than 8, '0' otherwise
+             memory: [3,9,7,9,10,9,4,9,99,-1,8],
+             input: Input([8]),
+             output: [0]),
+        ])
+    }
 
-            XCTAssertEqual(
-                output.map{ $0.Get() }, 
-                expectedOutput,
-                "Failed for testcase '\(testName)' with input \(input)")
-        }
+    func testInputOutput() throws {
+        RunInputTests([
+            ("4 means write to output",
+             memory: [4, 3, 99, 666],
+             input:  Input([]),
+             output: [666]),
+            ("3 means read from input",
+             // This program will read an input value and store it 
+             // in the spot of the "-1" so it is written to the output.
+             memory: [3, 0, 4, 0, 99],
+             input:  Input([999]),
+             output: [999]),
+            ("4 supports parameter mode",
+             memory: [104, 666, 99],
+             input:  Input([]),
+             output: [666])
+        ])
     }
 
     static var allTests = [
-        ("testRun", testRun),
-        ("testRunWithInput", testRunWithInput),
+        ("testBasicOperations", testBasicOperations),
+        ("testJumps", testJumps),
+        ("testInputOutput", testInputOutput),
     ]
 }

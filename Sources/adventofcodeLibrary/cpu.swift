@@ -76,11 +76,13 @@ public class Cpu {
                 case .Stop:
                     return memory.Get()
                 case .Advance(let offset):
-                    memory.Advance(offset)
+                    try memory.Advance(offset)
                 case .Write(let value, let address):
                     try memory.Write(value, at:address)
                 case .Print(let value):
                     output.Write(value)
+                case .JumpTo(let address):
+                    try memory.JumpTo(address)
                 }
             }
         }
