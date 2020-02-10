@@ -31,25 +31,29 @@ class NumberChecker {
         return true
     }
 
-    func ValueOrMinusOne(index:Int) -> Int {
-        if index < 0 || index >= digits.count {
-            return -1
-        }
-        return digits[index]
-    }
-
     func HasDouble() -> Bool {
-        for index in 1..<digits.count {
-            if digits[index-1] == digits[index] {
-                if ValueOrMinusOne(index:index-2) != digits[index] {
-                    if ValueOrMinusOne(index:index+1) != digits[index] {
-                        return true
-                    }
+        var previous_value = Int.min
+        var count = 0
+        for index in 0..<digits.count {
+            let new_value = digits[index]
+
+            if new_value == previous_value {
+                count += 1
+            } else {
+                if count == 2 {
+                    return true
                 }
+                previous_value = new_value
+                count = 1
             }
+        }
+
+        if count == 2 {
+            return true
         }
         return false
     }
+
 }
 
 // Note: completely untested as I simply bruteforced this
