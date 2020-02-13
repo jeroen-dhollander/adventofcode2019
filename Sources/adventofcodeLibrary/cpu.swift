@@ -1,13 +1,13 @@
 
 public class Input {
-    private var values : Stack<Int>
+    private var values : Queue<Int>
 
     public init(_ values: [Int] = []) {
-        self.values = Stack<Int>(values)
+        self.values = Queue<Int>(values)
     }
 
     func Read() throws -> Int {
-        if let result = values.pop() {
+        if let result = values.get() {
             return result
         }
         throw "Reading input value that is not there"

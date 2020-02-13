@@ -191,11 +191,16 @@ final class cpuTests: XCTestCase {
              input:  Input([]),
              output: [666]),
             ("3 means read from input",
-             // This program will read an input value and store it 
-             // in the spot of the "-1" so it is written to the output.
+             // This program will read an input value and write it to the output
              memory: [3, 0, 4, 0, 99],
              input:  Input([999]),
              output: [999]),
+            ("Can read multiple inputs",
+             // This program will read 2 input values and write the second one
+             // to the output
+             memory: [3, 0, 3, 1, 4, 1, 99],
+             input:  Input([111, 222]),
+             output: [222]),
             ("4 supports parameter mode",
              memory: [104, 666, 99],
              input:  Input([]),
