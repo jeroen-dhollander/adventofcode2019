@@ -74,4 +74,6 @@ func BreakPassword() {
 //CrossingWiresIntersection()
 // BreakPassword()
 //Day5()
-Day5Part2()
+//Day5Part2()
+//Day6()
+Day6Part2()
