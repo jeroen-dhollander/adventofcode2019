@@ -56,11 +56,7 @@ public class UniverseMap {
     var parentOf : [Object:Object] = [:]
 
     public static func CountOrbits(orbits:[String]) -> Int? {
-        let mapMaybe = UniverseMapBuilder(orbits).Build()
-        if let map = mapMaybe {
-            return map.CountAllOrbits()
-        }
-        return nil
+        return UniverseMapBuilder(orbits).Build()?.CountAllOrbits()
     }
 
     init(_ parentOf: [Object:Object]) {

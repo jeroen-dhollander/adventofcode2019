@@ -1,26 +1,50 @@
 import adventofcodeLibrary
 
+let memory = [
+    3,8,1001,8,10,8,105,1,0,0,21,38,63,88,97,118,199,280,361,442,99999,3,9,1002,9,3,9,101,2,9,
+    9,1002,9,4,9,4,9,99,3,9,101,3,9,9,102,5,9,9,101,3,9,9,1002,9,3,9,101,3,9,9,
+    4,9,99,3,9,1002,9,2,9,1001,9,3,9,102,3,9,9,101,2,9,9,1002,9,4,9,4,9,99,3,9,
+    102,2,9,9,4,9,99,3,9,102,4,9,9,101,5,9,9,102,2,9,9,101,5,9,9,4,9,99,3,9,
+    1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,
+    3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,
+    4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,99,3,9,101,1,9,9,4,9,3,9,102,
+    2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,
+    9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,
+    9,3,9,1001,9,1,9,4,9,99,3,9,1002,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,
+    9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,
+    102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,
+    99,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1002,9,2,
+    9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,
+    2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,1,9,9,4,9,99,3,9,101,1,9,9,4,9,
+    3,9,101,1,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,
+    4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,
+    1,9,4,9,3,9,1001,9,2,9,4,9,99]
+
+
+func SolveForPhaseSettings(_ phase_settings:[Int]) -> Int {
+    var inputs :[[Int]] = phase_settings.map { [$0]}
+    inputs[0].append(0)
+
+    return Amplifier(num_cpus:5, memory).Run(inputs: inputs)
+}
+
 func Day7() {
-    let memory = [3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0]
-
-    func SolveForPhaseSettings(_ phase_settings:[Int]) -> Int {
-        print("Phase settings: \(phase_settings)")
-        var previous_output = 0
-        for phase in phase_settings {
-            let output = Cpu(memory).Run(input:Input([phase, previous_output])) 
-            assert(output != nil)
-            print("   CPU: Input \([phase, previous_output]) -> Output \(output!.Get())")
-
-            previous_output = output!.Get()[0]
-        }
-        return previous_output
-    }
-
     let possible_phase_settings = Permutations().OfLength(5)
 
-    for phase_settings in possible_phase_settings {
-        let thrust = SolveForPhaseSettings(phase_settings)
-        print("\(phase_settings) --> \(thrust)")
-    }
+    let max_thrust = possible_phase_settings
+        .map(SolveForPhaseSettings)
+        .reduce(0, max)
+
+    print("Max thrust is \(max_thrust)")
+}
+
+func Day7Part2() {
+    let possible_phase_settings = Permutations().Of([5, 6, 7, 8, 9])
+
+    let max_thrust = possible_phase_settings
+        .map(SolveForPhaseSettings)
+        .reduce(0, max)
+
+    print("Max thrust is \(max_thrust)")
 }
 

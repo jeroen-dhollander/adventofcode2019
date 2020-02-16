@@ -15,13 +15,13 @@ enum Action {
 // Operations that can be executed by the IntCode computer.
 // Register all new operations in GetOperation below.
 protocol Operation {
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action]
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action]
 }
 
 class Addition : Operation {
     static let opcode = 1
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let value1 = try arguments.Get(1)
         let value2 = try arguments.Get(2)
@@ -36,7 +36,7 @@ class Addition : Operation {
 class Multiplication : Operation {
     static let opcode = 2
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let value1 = try arguments.Get(1)
         let value2 = try arguments.Get(2)
@@ -51,7 +51,7 @@ class Multiplication : Operation {
 class Read : Operation {
     static let opcode = 3
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input:inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let address = try arguments.GetAddress(1)
         let value = try input.Read()
@@ -65,7 +65,7 @@ class Read : Operation {
 class Print : Operation {
     static let opcode = 4
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let value = try arguments.Get(1)
         return [
@@ -78,7 +78,7 @@ class Print : Operation {
 class JumpIfTrue : Operation {
     static let opcode = 5
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let condition = try arguments.Get(1)
         let destination = try arguments.Get(2)
@@ -94,7 +94,7 @@ class JumpIfTrue : Operation {
 class JumpIfFalse : Operation {
     static let opcode = 6
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let condition = try arguments.Get(1)
         let destination = try arguments.Get(2)
@@ -110,7 +110,7 @@ class JumpIfFalse : Operation {
 class LessThan : Operation {
     static let opcode = 7
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let value1 = try arguments.Get(1)
         let value2 = try arguments.Get(2)
@@ -128,7 +128,7 @@ class LessThan : Operation {
 class Equals : Operation {
     static let opcode = 8
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         let arguments = ArgumentReader(memory)
         let value1 = try arguments.Get(1)
         let value2 = try arguments.Get(2)
@@ -145,7 +145,7 @@ class Equals : Operation {
 class Stop : Operation {
     static let opcode = 99
 
-    func Execute(_ memory: Memory, input:  Input) throws -> [Action] {
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
         return [Action.Stop]
     }
 }

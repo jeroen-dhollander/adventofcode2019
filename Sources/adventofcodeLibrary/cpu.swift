@@ -1,29 +1,27 @@
 
-public class Input {
-    private var values : Queue<Int>
-
-    public init(_ values: [Int] = []) {
-        self.values = Queue<Int>(values)
-    }
-
-    func Read() throws -> Int {
-        if let result = values.get() {
-            return result
-        }
-        throw "Reading input value that is not there"
-    }
-
+public protocol Input {
+    mutating func Read() throws -> Int 
 }
 
-public class Output {
-    private var values : [Int] = []
-
-    func Write(_ value : Int) {
-        values.append(value)
+// For ease of using we allow an [Int] as input
+extension Array : Input where Element == Int {
+    mutating public func Read() throws -> Int {
+        guard !self.isEmpty else {
+            throw "Reading from an empty Input"
+        }
+        return self.removeFirst()
     }
+}
 
-    public func Get() -> [Int] {
-        return values
+public protocol Output {
+    mutating func Write(_ value: Int)
+}
+
+// For ease of using we allow an [Int] as output
+extension Array : Output where Element == Int {
+
+    mutating public func Write(_ value: Int) {
+        self.append(value)
     }
 
 }
@@ -35,41 +33,41 @@ public class Output {
 public class Cpu {
 
     private var memory: MemoryImpl
-    private var output = Output()
+    public var name: String
 
-    public init(_ initialMemory: [Int]) {
+    public init(_ initialMemory: [Int], name: String = "<cpu>") {
         memory = MemoryImpl(initialMemory)
+        self.name = name
     }
 
-
-    // DNP explain
-    // Run the program loaded in memory, using the given input.
-    // Returns the output written by the memory, or nil if the memory could not be executed.
-    public func Run(input: Input) -> Output? {
+    // Run the program loaded in memory, and returns |true| if it executed
+    // successfully.
+    public func Run(input: inout Input, output: inout Output) -> Bool {
         do {
-            let _ = try tryToRun(input:input)
-            return output
+            let _ = try tryToRun(input:&input, output: &output)
+            return true
         } catch {
             print("Got error: \(error)")
-            return nil
+            return false
         }
     }
 
     // Run the program loaded in memory, and return the memory after execution
     // is completed. Returns nil if the memory could not be executed.
     public func Run() -> [Int]? {
-        do {
-            return try tryToRun(input:Input())
-        } catch {
-            print("Got error: \(error)")
+        var input : Input = []
+        var output : Output = []
+        guard Run(input:&input, output: &output) else {
             return nil
         }
+        return memory.Get()
     }
 
-    func tryToRun(input: Input) throws-> [Int]? {
+    func tryToRun(input: inout Input, output: inout Output) throws-> [Int]? {
         while true {
             let operation = try GetNextOperation()
-            let actions = try operation.Execute(memory, input:input)
+            print("CPU \(name): Executing operation \(operation)")
+            let actions = try operation.Execute(memory, input:&input)
 
             for action in actions {
                 switch action {

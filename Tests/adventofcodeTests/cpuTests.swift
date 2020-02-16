@@ -28,15 +28,21 @@ final class cpuTests: XCTestCase {
     }
 
     func RunInputTests(_ tests : [InputTestCase]) {
-        for (testName, memory, input, expectedOutput) in tests {
+        for (testName, memory, input_values, expectedOutput) in tests {
             print("-----")
             let cpu = Cpu(memory)
-            let output = cpu.Run(input:input)
+            var input : Input = input_values
+            var output : Output = []
+            if cpu.Run(input:&input, output:&output) {
+                XCTAssertEqual(
+                    output as? [Int], 
+                    expectedOutput,
+                    "Failed for testcase '\(testName)' with input \(input)")
+            }else {
+                XCTAssertEqual(nil, expectedOutput,
+                               "Testcase '\(testName)' should have failed but it didn't")
+            }
 
-            XCTAssertEqual(
-                output.map{ $0.Get() }, 
-                expectedOutput,
-                "Failed for testcase '\(testName)' with input \(input)")
         }
     }
 
@@ -164,22 +170,22 @@ final class cpuTests: XCTestCase {
             ("First example from the webpage",
              // Outputs '1' if input is 8, '0' otherwise
              memory: [3,9,8,9,10,9,4,9,99,-1,8],
-             input: Input([8]),
+             input: [8],
              output: [1]),
             ("First example from the webpage (2)",
              // Outputs '1' if input is 8, '0' otherwise
              memory: [3,9,8,9,10,9,4,9,99,-1,8],
-             input: Input([7]),
+             input: [7],
              output: [0]),
             ("Second example from the webpage",
              // Outputs '1' if input is less than 8, '0' otherwise
              memory: [3,9,7,9,10,9,4,9,99,-1,8],
-             input: Input([7]),
+             input: [7],
              output: [1]),
             ("Second example from the webpage (2)",
              // Outputs '1' if input is less than 8, '0' otherwise
              memory: [3,9,7,9,10,9,4,9,99,-1,8],
-             input: Input([8]),
+             input: [8],
              output: [0]),
         ])
     }
@@ -188,22 +194,22 @@ final class cpuTests: XCTestCase {
         RunInputTests([
             ("4 means write to output",
              memory: [4, 3, 99, 666],
-             input:  Input([]),
+             input:  [],
              output: [666]),
             ("3 means read from input",
              // This program will read an input value and write it to the output
              memory: [3, 0, 4, 0, 99],
-             input:  Input([999]),
+             input:  [999],
              output: [999]),
             ("Can read multiple inputs",
              // This program will read 2 input values and write the second one
              // to the output
              memory: [3, 0, 3, 1, 4, 1, 99],
-             input:  Input([111, 222]),
+             input:  [111, 222],
              output: [222]),
             ("4 supports parameter mode",
              memory: [104, 666, 99],
-             input:  Input([]),
+             input:  [],
              output: [666])
         ])
     }
