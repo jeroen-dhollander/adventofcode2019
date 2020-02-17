@@ -6,6 +6,8 @@ enum Action {
     case Advance(_ offset:Int)
     // Moves the current memory address to the given address.
     case JumpTo(address:Int)
+    // Advance the relative base address with the given offset
+    case ChangeRelativeBase(offset: Int)
     // Write a value to the memory at the given address
     case Write(_ value:Int, at:Int)
     // Print a value to the output
@@ -142,6 +144,21 @@ class Equals : Operation {
         ]
     }
 }
+
+class RelativeBaseOffset : Operation {
+    static let opcode = 9
+
+    func Execute(_ memory: Memory, input: inout Input) throws -> [Action] {
+        let arguments = ArgumentReader(memory)
+        let offset = try arguments.Get(1)
+
+        return [ 
+            Action.ChangeRelativeBase(offset:offset),
+            Action.Advance(2),
+        ]
+    }
+}
+
 class Stop : Operation {
     static let opcode = 99
 
@@ -164,6 +181,7 @@ func GetOperation(opcode: Int) throws -> Operation {
         JumpIfFalse.opcode: JumpIfFalse(),
         LessThan.opcode: LessThan(),
         Equals.opcode: Equals(),
+        RelativeBaseOffset.opcode: RelativeBaseOffset(),
         Stop.opcode: Stop(),
     ]
 

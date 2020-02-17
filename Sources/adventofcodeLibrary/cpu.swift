@@ -66,7 +66,7 @@ public class Cpu {
     func tryToRun(input: inout Input, output: inout Output) throws-> [Int]? {
         while true {
             let operation = try GetNextOperation()
-            print("CPU \(name): Executing operation \(operation)")
+            Logger.Debug("CPU \(name): Executing operation \(operation)")
             let actions = try operation.Execute(memory, input:&input)
 
             for action in actions {
@@ -81,6 +81,8 @@ public class Cpu {
                     output.Write(value)
                 case .JumpTo(let address):
                     try memory.JumpTo(address)
+                case .ChangeRelativeBase(let offset):
+                    memory.relative_base += offset
                 }
             }
         }

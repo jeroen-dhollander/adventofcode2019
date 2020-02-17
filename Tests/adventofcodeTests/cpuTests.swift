@@ -40,7 +40,7 @@ final class cpuTests: XCTestCase {
                     "Failed for testcase '\(testName)' with input \(input)")
             }else {
                 XCTAssertEqual(nil, expectedOutput,
-                               "Testcase '\(testName)' should have failed but it didn't")
+                               "Unexpected failure in testcase '\(testName)'")
             }
 
         }
@@ -190,6 +190,48 @@ final class cpuTests: XCTestCase {
         ])
     }
 
+    func testRelativeMode() throws {
+        RunInputTests([
+            ("Relative mode starts at zero",
+             memory: [204, +3, 99, 111],
+             input: [],
+             output: [111]
+            ),
+            ("Opcode 9 changes relative base",
+             memory: [204, +11, 109, 10, 204, +1, 109, 10, 204, -9, 99, 111],
+             input: [],
+             output: [111, 111, 111]
+            ),
+            ("Opcode 9 supports parameter mode",
+             //  set relative_base to '9', then read from 9-7
+             memory: [9, 0, 204, -7, 99],
+             input: [],
+             output: [204]
+            ),
+            ("Example from webpage day 9",
+             memory: [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99],
+             input: [],
+             output: [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+            ),
+            ("destination arguments support relative mode",
+             memory: [
+                // Set relative_base, 
+                109, 10,           
+                // read input (111) and store it
+                203, +10, 
+                // add 222 
+                22101, 222, +10, +10,
+                // multiply by 2 ,
+                22102, 2, +10, +10,
+                // print it
+                204, +10,
+                99],
+             input:  [111],
+             output: [666]
+            )
+        ])
+    }
+
     func testInputOutput() throws {
         RunInputTests([
             ("4 means write to output",
@@ -210,13 +252,41 @@ final class cpuTests: XCTestCase {
             ("4 supports parameter mode",
              memory: [104, 666, 99],
              input:  [],
-             output: [666])
+             output: [666]
+            ),
+            ("Supports large numbers",
+             memory: [104,1125899906842624,99],
+             input: [],
+             output: [1125899906842624]
+            ),
+            ("Supports large numbers 2",
+             memory: [1102,34915192,34915192,7,4,7,99,0],
+             input: [],
+             output: [1219070632396864]
+            ),
+        ])
+    }
+
+    func testMemorySpace() throws {
+        RunInputTests([
+            ("Reading from big addresses returns zero",
+             memory: [4, 100, 99],
+             input: [],
+             output: [0]
+            ),
+            ("Can write to big addresses",
+             memory: [1101, 11, 22, 100, 4, 100, 99],
+             input: [],
+             output: [33]
+            ),
         ])
     }
 
     static var allTests = [
         ("testBasicOperations", testBasicOperations),
         ("testJumps", testJumps),
+        ("testRelativeMode", testRelativeMode),
         ("testInputOutput", testInputOutput),
+        ("testMemorySpace", testMemorySpace),
     ]
 }
