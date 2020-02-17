@@ -23,6 +23,9 @@ public class Image {
     public var height : Int { get { height_ } }
     public var layers : [Layer] { get { layers_ } }
 
+    public func Render() -> [[Int]] {
+        return ImageRenderer(self).Render()
+    }
 
     func AddLayer(_ layer: Layer) {
         assert(layer.width == width)
@@ -76,6 +79,40 @@ class ImageBuilder {
 
         image.AddLayer(layer)
     }
+}
+
+class ImageRenderer {
+
+    var image : Image
+
+    init(_ image: Image) {
+        self.image = image
+    }
+
+    func Render() -> [[Int]] {
+        var result : [[Int]] = []
+        for row in 0..<image.height {
+            result.append(RenderRow(row))
+        }
+        return result
+    }
+
+    func RenderRow(_ row: Int) -> [Int] {
+        return Array(
+            (0..<image.width).map {
+                RenderPixel(row, $0)
+            }
+        )
+    }
+
+    func RenderPixel(_ row: Int, _ column: Int) -> Int {
+        return image.layers
+            .map{$0.pixels[row][column]}
+            .filter{ $0 != 2 }
+            .first!
+    }
+
+
 }
 
 extension StringProtocol {

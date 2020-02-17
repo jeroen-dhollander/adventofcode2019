@@ -192,11 +192,22 @@ let input = """
 """
 
 func Day8() {
-
     let image = Image.FromString( width:25, height:6, pixels:input)
 
     let result = image.layers
         .map{($0.NumberOf(0), $0.NumberOf(1)*$0.NumberOf(2))}
         .sorted(by: { $0.0 > $1.0 })
     print("The result is \(result)")
+}
+
+func Day8Part2() {
+    let image = Image.FromString( width:25, height:6, pixels:input)
+
+    func Render(_ value: Int) -> String {
+        return value == 0 ? " " : "*"
+    }
+
+    for row in image.Render() {
+        print(row.map{Render($0)}.joined())
+    }
 }
