@@ -61,3 +61,14 @@ func Day9() {
     }
     print("Result: \(output)")
 }
+
+func Day9Part2() {
+    var input : Input = [2]
+    var output : Output = []
+
+    guard Cpu(day9_memory).Run(input:&input, output:&output) else {
+        print("Error executing program")
+        return
+    }
+    print("Result: \(output)")
+}

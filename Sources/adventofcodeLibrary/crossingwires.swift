@@ -1,11 +1,4 @@
 
-public struct Point: Hashable, CustomStringConvertible, Equatable {
-    var x: Int
-    var y: Int
-
-    public var description : String { return "P(\(x), \(y))" }
-}
-
 enum Direction {
     case Up, Down, Left, Right
 }
