@@ -110,10 +110,103 @@ final class astroidMapTests: XCTestCase {
         }
     }
 
+    func testGetVisibleAstroids() {
+        let testcases = [
+            (
+                [
+                    "###",
+                    "###",
+                    "###", ],
+                center: Point(1, 1),
+                expected: [
+                    Point(1, 0),
+                    Point(2, 0),
+                    Point(2, 1),
+                    Point(2, 2),
+                    Point(1, 2),
+                    Point(0, 2),
+                    Point(0, 1),
+                    Point(0, 0),
+                ]
+            ),
+            (
+                [
+                    "#.#",
+                    ".#.",
+                    "..#", ],
+                center: Point(0, 0),
+                expected: [
+                    Point(2, 0),
+                    Point(1, 1),
+                ]
+            ),
+        ]
+
+        for (rows, center, expected) in testcases {
+            let map = AstroidMap.Build(rows)
+            let actual = map.GetVisibleAstroids(center)
+            XCTAssertEqual(expected.sorted(), actual.sorted(), "Failure for map \(rows)")
+        }
+    }
+
+    func testVaporizationOrder() {
+        let testcases = [
+            (
+                [
+                    "..#",
+                    ".#.",
+                    "..#", ],
+                center: Point(1, 1),
+                expected: [
+                    Point(2, 0),
+                    Point(2, 2),
+                ]
+            ),
+            (
+                [
+                    "###",
+                    "###",
+                    "###", ],
+                center: Point(1, 1),
+                expected: [
+                    Point(1, 0),
+                    Point(2, 0),
+                    Point(2, 1),
+                    Point(2, 2),
+                    Point(1, 2),
+                    Point(0, 2),
+                    Point(0, 1),
+                    Point(0, 0),
+                ]
+            ),
+            (
+                [
+                    "#.#",
+                    ".#.",
+                    "#.#", ],
+                center: Point(0, 2),
+                expected: [
+                    Point(0, 0),
+                    Point(1, 1),
+                    Point(2, 2),
+                    Point(2, 0),
+                ]
+            ),
+        ]
+
+        for (rows, center, expected) in testcases {
+            let map = AstroidMap.Build(rows)
+            let actual = map.GetVaporizationOrder(center)
+            XCTAssertEqual(expected, actual, "Failure for map \(rows)")
+        }
+    }
+
     static var allTests = [
         ("testBuild", testBuild),
         ("testGetAstroids", testGetAstroids),
         ("testCountVisibleAstroids", testCountVisibleAstroids),
         ("testBestSpot", testBestSpot),
+        ("testGetVisibleAstroids", testGetVisibleAstroids),
+        ("testVaporizationOrder", testVaporizationOrder),
     ]
 }

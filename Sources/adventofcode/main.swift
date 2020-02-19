@@ -13,4 +13,5 @@
 //Day8Part2()
 //Day9()
 //Day9Part2()
-Day10()
+//Day10()
+Day10Part2()

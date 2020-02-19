@@ -1,18 +1,31 @@
+import Foundation
 
-public struct Point: Hashable, CustomStringConvertible, Equatable {
+public struct Point: Hashable, CustomStringConvertible, Equatable, Comparable {
     var x: Int
     var y: Int
 
     public var description : String { return "P(\(x), \(y))" }
 
-    init(_ x: Int, _ y: Int) {
+    public init(_ x: Int, _ y: Int) {
         self.x = x
         self.y = y
     }
 
-    init(x: Int, y: Int) {
+    public init(x: Int, y: Int) {
         self.x = x
         self.y = y
+    }
+
+    public func DistanceTo(_ other: Point) -> Int {
+        // DNP rename
+        return abs(other.x - self.x) + abs(other.y - self.y)
+    }
+
+    public static func < (left: Point, right: Point) -> Bool {
+        if left.x != right.x {
+            return left.x < right.x
+        }
+        return left.y < right.y
     }
 }
 
@@ -20,21 +33,52 @@ public struct Point: Hashable, CustomStringConvertible, Equatable {
 // Will always be normalized, i.e. Angle(4, 2) will be translated to Angle(2, 1)
 struct Angle: Hashable, Equatable {
 
-    private var numerator_ : Int
-    private var denominator_ : Int
+    private var dx_ : Int
+    private var dy_ : Int
 
-    init(_ numerator: Int, _ denominator: Int) {
-        let gcd = GreatestCommonDenominator(abs(numerator), abs(denominator))
-        self.numerator_ = numerator/gcd
-        self.denominator_ = denominator/gcd
+    public init(_ dx: Int, _ dy: Int) {
+        let gcd = GreatestCommonDenominator(abs(dx), abs(dy))
+        self.dx_ = dx/gcd
+        self.dy_ = dy/gcd
     }
 
     static func Between(_ left: Point, _ right: Point) -> Angle {
-        return Angle(right.x-left.x, right.y-left.y)
+        // This is a bit funny and confusing,
+        //     If right.x > left.x then the dx is positive,
+        //     For y it is reverse as y increases upwards,
+        //        but in the grid a higher y value means it is lower
+        return Angle(right.x-left.x, left.y-right.y)
     }
 
-    var numerator :Int { return numerator_ }
-    var denominator :Int { return denominator_ }
+    //  Straight up is 0 degrees, right 90, down 180 and left 270
+    func ToDegrees() -> Double {
+        func ToDegrees(_ dx : Int, _ dy : Int) -> Double {
+            let radians = atan(Double(dx)/Double(dy))
+            let degrees = radians / Double.pi * 180
+            return degrees
+        }
+        switch (self.dx.sign, self.dy.sign) {
+        case (1, 1):
+            // 0 - 90 degrees
+            return ToDegrees(self.dx, self.dy)
+        case (1, -1):
+            // 90 - 180 degrees
+            return ToDegrees(-self.dy, self.dx) + 90
+        case (-1, -1):
+            // 180 - 270 degrees
+            return ToDegrees(-self.dx, -self.dy) + 180
+        case (-1, 1):
+            // 270 - 0 degrees
+            let result = ToDegrees(self.dy, -self.dx) + 270
+            return result > 360.0 ? result - 360 : result
+        default:
+            // Impossible to hit as |sign| will always return -1 or 1
+            assert(false)
+        }
+    }
+
+    var dx :Int { return dx_ }
+    var dy :Int { return dy_ }
 
 }
 
@@ -51,4 +95,10 @@ func GreatestCommonDenominator(_ left: Int, _ right: Int) -> Int {
         return left
     }
     return GreatestCommonDenominator(left % right, right)
+}
+
+extension Int {
+    var sign : Int {
+        return self < 0 ? -1 : 1
+    }
 }
