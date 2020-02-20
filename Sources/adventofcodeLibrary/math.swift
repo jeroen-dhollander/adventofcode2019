@@ -27,6 +27,14 @@ public struct Point: Hashable, CustomStringConvertible, Equatable, Comparable {
         }
         return left.y < right.y
     }
+
+    public static func +(_ point: Point, _ delta: (x:Int, y:Int)) -> Point {
+        return Point(point.x + delta.x, point.y + delta.y)
+    }
+
+    public static func +=(_ point: inout Point, _ delta: (x:Int, y:Int)) {
+        point = point + delta
+    }
 }
 
 // An angle, represented as a fraction to prevent floating point issues.

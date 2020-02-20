@@ -12,8 +12,9 @@ public func allTests() -> [XCTestCaseEntry] {
         // testCase(permutationsTests.allTests),
         // testCase(amplifierTests.allTests),
         // testCase(imageTests.allTests),
-        testCase(astroidMapTests.allTests),
-        testCase(mathTests.allTests),
+        // testCase(astroidMapTests.allTests),
+        // testCase(mathTests.allTests),
+        testCase(paintingRobotTests.allTests),
     ]
 }
 #endif
