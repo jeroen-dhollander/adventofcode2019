@@ -81,7 +81,7 @@ struct Angle: Hashable, Equatable {
             return result > 360.0 ? result - 360 : result
         default:
             // Impossible to hit as |sign| will always return -1 or 1
-            assert(false)
+            fatalError()
         }
     }
 

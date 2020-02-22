@@ -72,7 +72,39 @@ public struct ColorGrid {
             .filter{ (_: Cell, cellColor: Color) in cellColor == color }
             .map{ (cell: Cell, _: Color) in cell }
     }
+
+    public func Format(_ colors:[Color:String]) -> [String] {
+        let min_x = Min(cells.keys.map{ $0.x } )
+        let max_x = Max(cells.keys.map{ $0.x } )
+        let min_y = Min(cells.keys.map{ $0.y } )
+        let max_y = Max(cells.keys.map{ $0.y } )
+
+        func FormatColor(_ color : Color) -> String {
+            if let result = colors[color] {
+                return result
+            }
+            return " "
+        }
+
+        func FormatRow(_ x: Int) -> String {
+            return (min_y...max_y)
+                .map{ self[Cell(x, $0)] }
+                .reduce("", { $0 + FormatColor($1) })
+        }
+
+        return Array((min_x...max_x).map(FormatRow))
+    }
+
 }
+
+func Min(_ values: [Int]) -> Int {
+    return values.reduce(Int.max, min)
+}
+
+func Max(_ values: [Int]) -> Int {
+    return values.reduce(Int.min, max)
+}
+
 
 public class PaintingRobot {
 
@@ -93,7 +125,7 @@ public class PaintingRobot {
         var output : Output = RobotOutput(self)
         var input : Input = RobotInput(self)
         guard cpu.Run(input: &input, output: &output) else {
-            assert(false, "Failed to run")
+            fatalError("Failed to run")
         }
 
         grid = self.grid
@@ -162,14 +194,14 @@ class RobotOutput : Output {
 
     func DoPaint(_ value: Int) {
         guard let color = Color(rawValue: value) else {
-            assert(false, "Invalid color \(value)")
+            fatalError("Invalid color \(value)")
         }
         self.robot.grid[self.robot.position] = color
     }
 
     func DoTurn(_ value: Int) {
         guard let direction = Turn(rawValue: value) else {
-            assert(false, "Invalid turn \(value)")
+            fatalError("Invalid turn \(value)")
         }
         self.robot.TurnAndMove(direction)
     }

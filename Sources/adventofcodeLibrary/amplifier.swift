@@ -48,7 +48,7 @@ public class Amplifier {
 
     private func SetInitialInput(_ inputs: [[Int]]) {
         if !inputs.isEmpty {
-            assert(inputs.count == num_cpus)
+            //assert(inputs.count == num_cpus)
             for (index, values) in inputs.enumerated() {
                 for value in values {
                     queues[index].Add(value)
@@ -72,7 +72,7 @@ public class Amplifier {
         var output = self.outputs[index]
         print("Starting CPU \(cpu.name)")
         let success =  cpu.Run(input:&input, output:&output) 
-        assert(success, "Execution failed on CPU \(cpu.name)")
+        //assert(success, "Execution failed on CPU \(cpu.name)")
         print("CPU \(cpu.name) is done")
     }
 
@@ -84,7 +84,7 @@ public class Amplifier {
     private func GetResult() -> Int {
         let last_output = queues[0]
         guard let result = last_output.Get(block: false) else {
-            assert(false, "No result printed to \(last_output.name)")
+            fatalError( "No result printed to \(last_output.name)")
         }
         return result
     }

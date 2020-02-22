@@ -35,7 +35,7 @@ class ArgumentReader {
     func GetAddress(_ argument_index:Int) throws -> Int {
         switch try GetDestinationParameterMode(argument_index) {
         case .Position:
-            assert(false)
+            fatalError()
         case .Immediate:
             return try memory.Read(offset:argument_index)
         case .Relative:

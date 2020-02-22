@@ -1,4 +1,3 @@
-
 import XCTest
 @testable import adventofcodeLibrary
 
@@ -101,6 +100,26 @@ final class paintingRobotTests: XCTestCase {
         XCTAssertEqual(grid[Cell(1,0)], Color.Yellow)
     }
 
+    func CanFormatGrid() throws {
+        let expectedOutput = [
+            "*  ",
+            " * ",
+            "  *",
+        ]
+
+        grid[Cell(-1,-1)] = .White
+        grid[Cell(0,0)] = .White
+        grid[Cell(1,1)] = .White
+
+
+        let output = grid.Format([
+            Color.Black : " ",
+            Color.White : "*",
+        ])
+
+        XCTAssertEqual(expectedOutput, output)
+    }
+
     func RunRobot(instructions: [[Int]], startCell: Cell = Cell(0,0)) {
         let memory = Array(instructions.joined())
         print("instructions are \(memory)")
@@ -124,5 +143,6 @@ final class paintingRobotTests: XCTestCase {
         ("ChangesOrientationAfterRightTurns", ChangesOrientationAfterRightTurns),
         ("ChangesOrientationAfterLeftTurns", ChangesOrientationAfterLeftTurns),
         ("CanReadCurrentCellValueFromTheInput", CanReadCurrentCellValueFromTheInput),
+        ("CanFormatGrid", CanFormatGrid),
     ]
 }
