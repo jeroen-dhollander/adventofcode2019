@@ -48,7 +48,7 @@ public class Amplifier {
 
     private func SetInitialInput(_ inputs: [[Int]]) {
         if !inputs.isEmpty {
-            //assert(inputs.count == num_cpus)
+            precondition(inputs.count == num_cpus)
             for (index, values) in inputs.enumerated() {
                 for value in values {
                     queues[index].Add(value)
@@ -72,7 +72,7 @@ public class Amplifier {
         var output = self.outputs[index]
         print("Starting CPU \(cpu.name)")
         let success =  cpu.Run(input:&input, output:&output) 
-        //assert(success, "Execution failed on CPU \(cpu.name)")
+        precondition(success, "Execution failed on CPU \(cpu.name)")
         print("CPU \(cpu.name) is done")
     }
 

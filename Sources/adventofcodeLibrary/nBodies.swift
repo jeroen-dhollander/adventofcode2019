@@ -23,22 +23,101 @@ public struct Position : Hashable, Equatable, CustomStringConvertible {
 
 public typealias Velocity = Position
 
+public class SingleDimensionNBodies {
+
+    private var velocities_ : [Int] = []
+    private var positions_ : [Int] = []
+
+    public func addBody(position: Int, velocity: Int) {
+        self.velocities_.append(velocity)
+        self.positions_.append(position)
+    }
+
+    public func advanceTime() {
+        self.updateVelocities()
+        self.updatePositions()
+    }
+
+    private func updateVelocities() {
+        func GetDelta(_ this: Int, _ other: Int) -> Int {
+            if this < other {
+                return 1
+            } else if this > other {
+                return -1
+            }
+            else {
+                return 0
+            }
+        }
+
+        for (index, position) in self.positions_.enumerated() {
+            let delta = self.positions_
+                .map{ GetDelta(position, $0) }
+                .reduce(0, +)
+
+            self.velocities_[index] += delta
+        }
+    }
+
+    private func updatePositions() {
+        for (index, velocity) in self.velocities_.enumerated() {
+            self.positions_[index] += velocity
+        }
+    }
+
+    public func velocityOf(_ index: Int) -> Int {
+        return self.velocities_[index]
+    }
+
+    public func positionOf(_ index: Int) -> Int {
+        return self.positions_[index]
+    }
+
+    public var velocities : [Int] { return self.velocities_ }
+    public var positions : [Int] { return self.positions_ }
+
+}
 
 public class NBodies {
+
+    private var names: [String]
+    // Should not really be public
+    public var x: SingleDimensionNBodies 
+    public var y: SingleDimensionNBodies
+    public var z: SingleDimensionNBodies
 
     private var velocities : [String:Velocity]
     private var positions : [String:Position]
 
     public init(_ bodies: [(name: String, position:Position, velocity:Velocity)]) {
+        self.names = bodies.map{$0.name}
+
         self.velocities = bodies.reduce(into: [String:Velocity]()) {
             $0[$1.name] = $1.velocity
         }
         self.positions = bodies.reduce(into: [String:Position]()) {
             $0[$1.name] = $1.position
         }
+
+        x = SingleDimensionNBodies()
+        for (_, position, velocity) in bodies {
+            x.addBody(position:position.x, velocity:velocity.x)
+        }
+        y = SingleDimensionNBodies()
+        for (_, position, velocity) in bodies {
+            y.addBody(position:position.y, velocity:velocity.y)
+        }
+        z = SingleDimensionNBodies()
+        for (_, position, velocity) in bodies {
+            z.addBody(position:position.z, velocity:velocity.z)
+        }
+
     }
 
     public func advanceTime() {
+        x.advanceTime()
+        y.advanceTime()
+        z.advanceTime()
         self.updateVelocities()
         self.updatePositions()
     }
@@ -80,11 +159,21 @@ public class NBodies {
     }
 
     public func velocityOf(_ name: String) -> Velocity! {
-        return self.velocities[name]
+        let index = self.names.firstIndex(of: name)!
+        return Velocity(
+            x.velocityOf(index),
+            y.velocityOf(index),
+            z.velocityOf(index)
+        )
     }
 
     public func positionOf(_ name: String) -> Position! {
-        return self.positions[name]
+        let index = self.names.firstIndex(of: name)!
+        return Position(
+            x.positionOf(index),
+            y.positionOf(index),
+            z.positionOf(index)
+        )
     }
 
     public var bodies : [String] { return Array(self.positions.keys) }
