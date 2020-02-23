@@ -1,3 +1,4 @@
+import Glibc
 
 public enum Tile : String {
     // 2 spaces seems to render with the same width as the unicode characters.
@@ -68,6 +69,7 @@ public class Arcade {
     public typealias Cell = ArcadeScreen.Cell
 
     public var screen = ArcadeScreen()
+    public var score : Int = 0
     private var cpu : Cpu
 
     public init(_ instructions: [Int]) {
@@ -75,30 +77,95 @@ public class Arcade {
     }
 
     public func run() {
+        var input: Input = []
+        run(input: &input)
+    }
 
-        var output : Output = []
-        var input : Input = []
-
+    public func run(input: inout Input, drawOnOutput: Bool = false) {
+        var output : Output = ArcadeOutput(self, drawOnOutput:drawOnOutput)
         guard cpu.Run(input: &input, output: &output) else {
             fatalError("Failed to run")
         }
-
-        processOutput(output as! [Int])
     }
 
-    private func processOutput(_ output: [Int]) {
-        assert(output.count % 3 == 0)
+    public func draw() {
+        print("")
+        self.screen.draw()
+        print("Score: \(self.score)")
+    }
 
-        for i in stride(from: 0, to: output.count, by: 3) {
-            let x = output[i]
-            let y = output[i+1]
-            let tile = Tile.fromInt(output[i+2])!
-
+    fileprivate func processOutput(_ x: Int, _ y: Int, _ value: Int) {
+        switch (x, y) {
+        case (-1, 0):
+            self.score = value
+        default:
+            let tile = Tile.fromInt(value)!
             update(tile, at:Cell(x,y))
         }
     }
 
     public func update(_ value: Tile, at: Cell) {
         screen[at] = value
+    }
+}
+
+// Input for the Arcade, driven by an AI.
+// Will always move the paddle closer to the ball
+public class ArcadeAiInput : Input {
+    private var arcade: Arcade
+
+    public init(_ arcade: Arcade) {
+        self.arcade = arcade
+    }
+
+    public func Read() throws -> Int {
+        if ball < paddle {
+            return -1
+        } else if ball > paddle {
+            return 1
+        } else {
+            return 0
+        }
+    }
+
+    private var ball : Int { return xPosOf(.Ball) }
+    private var paddle : Int { return xPosOf(.Paddle) }
+
+    private func xPosOf(_ tile: Tile) -> Int {
+        return arcade.screen.cells
+            .map{ (cell:$0, value:$1) }
+            .filter{ $0.value == tile }
+            .map { $0.cell.x }
+            .first!
+    }
+
+
+}
+
+private class ArcadeOutput : Output {
+    private var arcade: Arcade
+    private var drawOnOutput: Bool
+    private var buffer: [Int] = []
+
+    init(_ arcade: Arcade, drawOnOutput: Bool) {
+        self.arcade = arcade
+        self.drawOnOutput = drawOnOutput
+    }
+
+    func Write(_ value: Int) {
+        if buffer.count == 2 {
+            arcade.processOutput(buffer[0], buffer[1], value)
+            if drawOnOutput {
+                system("clear")
+                arcade.draw() // Does not really belong here :/
+            }
+            buffer = []
+        }
+        else {
+            buffer.append(value)
+            return
+        }
+
+
     }
 }
