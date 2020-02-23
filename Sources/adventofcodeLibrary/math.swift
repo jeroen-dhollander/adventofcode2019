@@ -110,3 +110,12 @@ extension Int {
         return self < 0 ? -1 : 1
     }
 }
+
+func Min(_ values: [Int]) -> Int {
+    return values.reduce(Int.max, min)
+}
+
+func Max(_ values: [Int]) -> Int {
+    return values.reduce(Int.min, max)
+}
+

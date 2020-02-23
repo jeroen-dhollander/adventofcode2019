@@ -45,7 +45,7 @@ func Day11Part2() {
     grid[Cell(0,0)] = .White
     robot.RunOnGrid(&grid)
 
-    for row in grid.Format([.White:"#"]).reversed() {
+    for row in grid.Format([.White:"#"]) {
         print("   \(row)")
     }
 }

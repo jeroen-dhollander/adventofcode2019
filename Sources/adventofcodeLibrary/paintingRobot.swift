@@ -15,7 +15,6 @@ enum Turn : Int {
 public enum Orientation: Int {
     case North = 0, East, South, West
 
-
     fileprivate mutating func TurnTo(_ turn: Turn) {
         func GetNextOrientation() -> Orientation {
             switch turn {
@@ -86,25 +85,16 @@ public struct ColorGrid {
             return " "
         }
 
-        func FormatRow(_ x: Int) -> String {
-            return (min_y...max_y)
-                .map{ self[Cell(x, $0)] }
+        func FormatRow(_ y: Int) -> String {
+            return (min_x...max_x)
+                .map{ self[Cell($0, y)] }
                 .reduce("", { $0 + FormatColor($1) })
         }
 
-        return Array((min_x...max_x).map(FormatRow))
+        return Array((min_y...max_y).map(FormatRow))
     }
 
 }
-
-func Min(_ values: [Int]) -> Int {
-    return values.reduce(Int.max, min)
-}
-
-func Max(_ values: [Int]) -> Int {
-    return values.reduce(Int.min, max)
-}
-
 
 public class PaintingRobot {
 
