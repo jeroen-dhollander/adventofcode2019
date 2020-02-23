@@ -1,8 +1,8 @@
 import Foundation
 
 public struct Point: Hashable, CustomStringConvertible, Equatable, Comparable {
-    var x: Int
-    var y: Int
+    public var x: Int
+    public var y: Int
 
     public var description : String { return "P(\(x), \(y))" }
 

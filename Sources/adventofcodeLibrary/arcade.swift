@@ -1,4 +1,3 @@
-import Glibc
 
 public enum Tile : String {
     // 2 spaces seems to render with the same width as the unicode characters.
@@ -25,7 +24,6 @@ public enum Tile : String {
         }
     }
 }
-
 
 public struct ArcadeScreen {
 
@@ -57,6 +55,10 @@ public struct ArcadeScreen {
         return Array((min_y...max_y).map(formatRow))
     }
 
+    public var height : Int {
+        return Max(cells.keys.map{ $0.y })
+    }
+
     public func draw() {
         let _ = self.format().map{
             print($0)
@@ -64,12 +66,24 @@ public struct ArcadeScreen {
     }
 }
 
+public protocol ArcadeObserver {
+
+    func onPrint(_ tile: Tile, at: Arcade.Cell)
+    func onScoreUpdate(_ score: Int)
+}
+
 public class Arcade {
 
     public typealias Cell = ArcadeScreen.Cell
 
     public var screen = ArcadeScreen()
-    public var score : Int = 0
+    public var score : Int = 0 {
+        didSet {
+            for observer in observers { observer.onScoreUpdate(score) }
+        }
+
+    }
+    private var observers: [ArcadeObserver] = []
     private var cpu : Cpu
 
     public init(_ instructions: [Int]) {
@@ -81,11 +95,15 @@ public class Arcade {
         run(input: &input)
     }
 
-    public func run(input: inout Input, drawOnOutput: Bool = false) {
-        var output : Output = ArcadeOutput(self, drawOnOutput:drawOnOutput)
+    public func run(input: inout Input) {
+        var output : Output = ArcadeOutput(self)
         guard cpu.Run(input: &input, output: &output) else {
             fatalError("Failed to run")
         }
+    }
+
+    public func addObserver(_ observer: ArcadeObserver) {
+        self.observers.append(observer)
     }
 
     public func draw() {
@@ -106,6 +124,8 @@ public class Arcade {
 
     public func update(_ value: Tile, at: Cell) {
         screen[at] = value
+
+        for observer in observers { observer.onPrint(value, at: at) }
     }
 }
 
@@ -138,27 +158,19 @@ public class ArcadeAiInput : Input {
             .map { $0.cell.x }
             .first!
     }
-
-
 }
 
 private class ArcadeOutput : Output {
     private var arcade: Arcade
-    private var drawOnOutput: Bool
     private var buffer: [Int] = []
 
-    init(_ arcade: Arcade, drawOnOutput: Bool) {
+    init(_ arcade: Arcade) {
         self.arcade = arcade
-        self.drawOnOutput = drawOnOutput
     }
 
     func Write(_ value: Int) {
         if buffer.count == 2 {
             arcade.processOutput(buffer[0], buffer[1], value)
-            if drawOnOutput {
-                system("clear")
-                arcade.draw() // Does not really belong here :/
-            }
             buffer = []
         }
         else {

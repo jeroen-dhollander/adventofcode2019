@@ -1,4 +1,6 @@
 import adventofcodeLibrary
+import Glibc
+import Foundation
 
 func Day13() {
     let arcade = Arcade(instructions)
@@ -15,8 +17,84 @@ func Day13Part2() {
     instructions[0] = 2
     let arcade = Arcade(instructions)
 
+    let observer = ArcadeDrawer(arcade)
+    arcade.addObserver(observer)
+
     var input : Input = ArcadeAiInput(arcade)
-    arcade.run(input: &input, drawOnOutput: true)
+    arcade.run(input: &input)
+}
+
+func Day13Interactive() {
+    instructions[0] = 2
+    let arcade = Arcade(instructions)
+
+    let observer = ArcadeDrawer(arcade)
+    arcade.addObserver(observer)
+    var input : Input = InteractiveInput()
+    arcade.run(input: &input)
+}
+
+let kRightArrow = 67
+let kLeftArrow = 68
+let kDownArrow = 66
+let kUpArrow = 65
+let kCtrlC = 3
+
+class InteractiveInput : Input {
+
+    init() {
+    }
+
+    func Read() throws -> Int {
+        // Read input without waiting for the user to type <enter>.
+        system ("/bin/stty raw")
+        defer { system ("/bin/stty cooked") }
+
+        while true {
+            let input = Int(Glibc.getchar())
+            switch (input) {
+            case kRightArrow:
+                return 1
+            case kLeftArrow:
+                return -1
+            case kDownArrow, kUpArrow:
+                return 0
+            case kCtrlC:
+                throw "We're done"
+            default:
+                continue
+            }
+        }
+    }
+
+}
+
+class ArcadeDrawer : ArcadeObserver {
+    private var arcade: Arcade
+
+    init(_ arcade: Arcade) {
+        self.arcade = arcade
+        Glibc.system("clear")
+    }
+
+    func onPrint(_ tile: Tile, at: Arcade.Cell) { 
+        // There are issues printing at 0 (hence the +1).
+        // Each tile is 2 characters wide (hence the *2).
+        printAt(x:at.x*2+1, y:at.y+1, text:tile.rawValue)
+
+    }
+
+    func onScoreUpdate(_ score: Int) { 
+        printAt(x:0, y:self.arcade.screen.height+1, text: "Score \(score)")
+    }
+
+    func printAt(x: Int, y: Int, text: String) {
+        system("printf '\\033[\(y);\(x)H\(text)\\n'")
+        // This moves the cursor to below the entire output.
+        // A bit hacky but it prevent the cursor from showing up in the middle
+        // of the game field
+        system("printf '\\033[\(self.arcade.screen.height+2);\(0)H \\n'")
+    }
 }
 
 fileprivate var instructions = [
