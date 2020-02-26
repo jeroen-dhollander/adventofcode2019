@@ -17,6 +17,7 @@ public func allTests() -> [XCTestCaseEntry] {
         testCase(paintingRobotTests.allTests),
         testCase(nBodiesTests.allTests),
         testCase(arcadeTests.allTests),
+        testCase(fuelProducerTests.allTests),
     ]
 }
 #endif

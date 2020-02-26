@@ -119,3 +119,10 @@ func Max(_ values: [Int]) -> Int {
     return values.reduce(Int.min, max)
 }
 
+func DivideAndRoundUp(_ numerator: Int, _ denominator: Int) -> Int {
+    if numerator % denominator == 0 {
+        return numerator/denominator
+    }
+    return numerator/denominator + 1
+}
+

@@ -1,10 +1,10 @@
 
-class Logger {
-    enum Level : Int, Comparable {
+public class Logger {
+    public enum Level : Int, Comparable {
         case Verbose = 0
         case Debug
         case Info
-        case severe
+        case Severe
 
         // Implement Comparable
         public static func < (left: Level, right: Level) -> Bool {
@@ -12,7 +12,7 @@ class Logger {
         }
     }
 
-    static var level : Level = Level.Info
+    public static var level : Level = Level.Info
 
     static func Verbose(_ message: String) {
         if level <= Level.Verbose {
